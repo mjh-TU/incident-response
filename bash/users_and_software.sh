@@ -26,16 +26,59 @@ help () {
     echo
     head "Options:"
     echo "  -h  Show current help message"
-    echo 
+    echo "  -u  Show current active logged in users"
+}
+
+everything() {
+    users
+    sshlogins
+    software
+}
+
+sshlogins () {
+    head "SSH Logins:"
+    # Show SSH logins on the current day
+    journalctl -u ssh --no-pager | grep "$(date "+%b %d")"
+    echo
 }
 
 users () {
+    head "Current logged in users:"
     if [[ $DISTRIBUTION == "debian" ]]
         # Get current active users logged in
         then who | awk '{print $1}'
     fi
+    echo
 }
 
+software() {
+
+    head "Software Installed:"
+
+    if [[ $DISTRIBUTION == "debian" ]]
+        then dpkg --get-selections --no-pager | awk '{print $1}'
+    fi
+
+    if [[ $DISTRIBUTION == "rhelold" ]]
+        # Test the one below still
+        then yum list installed | awk '{print $1}'
+    fi
+
+    echo
+    head "Outdated Software:"
+
+    if [[ $DISTRIBUTION == "debian" ]]
+        then apt list --upgradable
+    fi
+
+    if [[ $DISTRIBUTION == "rhelold" ]]
+        # Test the one below still
+        then yum check-update
+    fi
+
+    echo
+
+}
 # ...................... Main ......................
 
 
@@ -62,6 +105,7 @@ if [[ "$1" != "-h" ]]; then
     echo
     head "Name:"
     echo "User's and Software detection script"
+    echo
     head "Identified Distribution: "
     echo $DISTRIBUTION
     echo
@@ -73,4 +117,6 @@ case $1 in
         "-h")   help;;
         "-u")   users;;
         "-s")   software;;
+        "-ssh") sshlogins;;
+        "-e")   everything;;
 esac
