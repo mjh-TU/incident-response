@@ -1,0 +1,38 @@
+# Ignore environment and credential files
+.env
+.env.local
+.env.*.local
+config.yml
+config.json
+secrets.json
+credentials/
+auth/
+
+# Ignore SSH and private keys
+id_rsa*
+*.pem
+*.key
+*.crt
+*.pfx
+
+# Ignore logs and debug files
+logs/
+*.log
+*.out
+*.pid
+*.trace
+
+# Ignore database and cache files
+*.sqlite
+*.db
+*.sqlite3
+*.mdb
+*.ldb
+
+# Ignore OS-specific and editor-specific files
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
+*.swp
+.obsidian/
