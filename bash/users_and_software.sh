@@ -25,8 +25,11 @@ help () {
     echo "Bash Script to gather active users, software, outdated software, and identify USB history"
     echo
     head "Options:"
-    echo "  -h  Show current help message"
-    echo "  -u  Show current active logged in users"
+    echo "  -h      Show current help message"
+    echo "  -u      Show current active logged in users"
+    echo "  -s      Show software name and version, including outdated software"
+    echo "  -ssh    Show SSH Logins"
+    echo "  -e      Full Analysis Mode"
 }
 
 everything() {
@@ -36,9 +39,21 @@ everything() {
 }
 
 sshlogins () {
+
     head "SSH Logins:"
     # Show SSH logins on the current day
-    journalctl -u ssh --no-pager | grep "$(date "+%b %d")"
+
+    if [[ $DISTRIBUTION == "debian" ]]
+        then sshlogins=$(journalctl -u ssh --no-pager | grep "$(date "+%b %d")")
+        # Check if output of command has any characters
+        if [[ -n "$sshlogins" ]]
+            then echo $sshlogins
+        else
+            # If no output from command then there are no SSH Logins
+            echo "None"
+        fi
+    fi
+
     echo
 }
 
@@ -56,7 +71,8 @@ software() {
     head "Software Installed:"
 
     if [[ $DISTRIBUTION == "debian" ]]
-        then dpkg --get-selections --no-pager | awk '{print $1}'
+        # Print package name and version for installed deb packages
+        then dpkg -l --no-pager | awk '{print $2 $3}'
     fi
 
     if [[ $DISTRIBUTION == "rhelold" ]]
