@@ -30,14 +30,11 @@ help () {
 }
 
 users () {
-
-    if [[ DISTRIBUTION == "debian" ]] {
+    if [[ $DISTRIBUTION == "debian" ]]
         # Get current active users logged in
-        who | awk '{print $1}'
-    }
-    
+        then who | awk '{print $1}'
+    fi
 }
-
 
 # ...................... Main ......................
 
