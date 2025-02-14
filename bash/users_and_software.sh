@@ -2,7 +2,8 @@
 
 # ...................... Variables ......................
 
-
+# Pass flag variable into FLAG variable
+FLAG=$1
 
 # ...................... Functions ......................
 
@@ -35,6 +36,7 @@ help () {
 everything() {
     users
     sshlogins
+    processes
     software
 }
 
@@ -95,11 +97,25 @@ software() {
     echo
 
 }
+
+processes () {
+    head "Processes:"
+    if [[ $DISTRIBUTION == "debian" ]]; then
+        ps -auxf
+    fi
+    echo
+}
+
+
 # ...................... Main ......................
 
+# Give default flag to run everything mode if no flags given
+if [[ "$FLAG" == "" ]]; then
+    FLAG="-e"
+fi
 
 # If not help flag then
-if [[ "$1" != "-h" ]]; then
+if [[ "$FLAG" != "-h" ]]; then
 
     # If user running as root continue
     if [ "$EUID" -ne 0 ]; then
@@ -129,10 +145,11 @@ if [[ "$1" != "-h" ]]; then
 fi
 
 # gathers CLI argument and runs specified function
-case $1 in
+case $FLAG in
         "-h")   help;;
         "-u")   users;;
         "-s")   software;;
         "-ssh") sshlogins;;
         "-e")   everything;;
+        "-p")   processes;;
 esac
