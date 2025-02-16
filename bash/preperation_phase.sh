@@ -31,6 +31,7 @@ help () {
     echo "  -s      Show software name and version, including outdated software"
     echo "  -ssh    Show SSH Logins"
     echo "  -e      Full Analysis Mode"
+    echo "  -usb    Show USB Logs"
 }
 
 everything() {
@@ -38,6 +39,7 @@ everything() {
     sshlogins
     processes
     software
+    usbactivity
 }
 
 sshlogins () {
@@ -55,8 +57,6 @@ sshlogins () {
             echo "None"
         fi
     fi
-
-    echo
 }
 
 users () {
@@ -65,7 +65,6 @@ users () {
         # Get current active users logged in
         then who | awk '{print $1}'
     fi
-    echo
 }
 
 software() {
@@ -82,7 +81,6 @@ software() {
         then yum list installed | awk '{print $1}'
     fi
 
-    echo
     head "Outdated Software:"
 
     if [[ $DISTRIBUTION == "debian" ]]
@@ -94,7 +92,6 @@ software() {
         then yum check-update
     fi
 
-    echo
 
 }
 
@@ -103,9 +100,14 @@ processes () {
     if [[ $DISTRIBUTION == "debian" ]]; then
         ps -auxf
     fi
-    echo
 }
 
+usbactivity () {
+    head "USB Activity:"
+    if [[ $DISTRIBUTION == "debian" ]]; then
+       journalctl -k | grep -i usb 
+    fi
+}
 
 # ...................... Main ......................
 
@@ -134,13 +136,10 @@ if [[ "$FLAG" != "-h" ]]; then
         then DISTRIBUTION="arch"
     fi
 
-    echo
     head "Name:"
     echo "User's and Software detection script"
-    echo
     head "Identified Distribution: "
     echo $DISTRIBUTION
-    echo
 
 fi
 
@@ -152,4 +151,5 @@ case $FLAG in
         "-ssh") sshlogins;;
         "-e")   everything;;
         "-p")   processes;;
+        "-usb") usbactivity;;
 esac
