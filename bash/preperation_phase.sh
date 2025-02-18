@@ -30,8 +30,9 @@ help () {
     echo "  -u      Show current active logged in users"
     echo "  -s      Show software name and version, including outdated software"
     echo "  -ssh    Show SSH Logins"
-    echo "  -e      Full Analysis Mode"
     echo "  -usb    Show USB Logs"
+    echo "  -e      Full Analysis Mode"
+    
 }
 
 everything() {
@@ -73,7 +74,7 @@ software() {
 
     if [[ $DISTRIBUTION == "debian" ]]
         # Print package name and version for installed deb packages
-        then dpkg -l --no-pager | awk '{print $2 $3}'
+        then dpkg -l --no-pager | awk '{print $2 " " $3}'
     fi
 
     if [[ $DISTRIBUTION == "rhelold" ]]
