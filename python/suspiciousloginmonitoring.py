@@ -48,14 +48,14 @@ def analyze_logs():
                         if len(failed_attempts[ip]) >= threshold:
                             if ip not in last_alert_time or now - last_alert_time[ip] >= time_window:
                                 print(f"\033[1;31mALERT\033[0m: Potential brute-force attack from IP: {ip}")
-                            try:
-                                print(f"WARNING: Blocking potential brute-force from IP: {ip}")
-                                result = subprocess.run(["sudo", "iptables", "-A", "INPUT", "-s", ip, "-j", "DROP"], check=True, capture_output=True)
-                                print(f"WARNING: Blocked IP {ip}")
-                            except subprocess.CalledProcessError as e:
-                                print(f"ERROR: {e}")
+                                try:
+                                    print(f"WARNING: Blocking potential brute-force from IP: {ip}")
+                                    result = subprocess.run(["sudo", "iptables", "-A", "INPUT", "-s", ip, "-j", "DROP"], check=True, capture_output=True)
+                                    print(f"WARNING: Blocked IP {ip}")
+                                except subprocess.CalledProcessError as e:
+                                    print(f"ERROR: {e}")
 
-                            last_alert_time[ip] = now
+                                last_alert_time[ip] = now
 
             time.sleep(60) # Check every minute
             
