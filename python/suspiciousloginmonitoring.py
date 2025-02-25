@@ -19,6 +19,8 @@ threshold = 5
 time_window = 600 # 10 minutes in seconds
 # Dictionary to store failed login attempts (IP: [timestamps])
 failed_attempts = defaultdict(list)
+# Dictionary to track last time IP was alerted
+last_alert_time = {}
 
 def analyze_logs():
     last_position = 0
