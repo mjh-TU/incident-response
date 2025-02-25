@@ -19,22 +19,33 @@ threshold = 5
 time_window = 600 # 10 minutes in seconds
 # Dictionary to store failed login attempts (IP: [timestamps])
 failed_attempts = defaultdict(list)
+
 def analyze_logs():
+    last_position = 0
+    
     while True:
         try:
             with open(log_file, "r") as f:
-                for line in f:
-                    # Regex to extract IP and login status (adapt to your log format)
+                f.seek(last_position)
+                lines = f.readlines()
+                last_position = f.tell()
+
+                now = time.time()
+                
+                for line in lines:
+                    # Regex to extract IP from failed login attempts
                     match = re.search(r"Failed\spassword\sfor\s.*\s(?P<ip>\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3})", line, re.IGNORECASE)
                     if match:
                         ip = match.group("ip")
-                        failed_attempts[ip].append(time.time())
-                        # Check for threshold
-                        now = time.time()
-                        recent_attempts = [t for t in failed_attempts[ip] if now - t < time_window]
-                        failed_attempts[ip] = recent_attempts # Keep onlyrecent attempts
-                        if len(recent_attempts) >= threshold:
-                            print(f"ALERT: Potential brute-force attack from IP: {ip}")
+                        failed_attempts[ip].append(now)
+                        
+                        # Only recent attempts
+                        failed_attempts[ip] = [t for t in failed_attempts[ip] if now - t < time_window]
+
+                        # Threshold check
+                        if len(failed_attempts[ip]) >= threshold:
+                            if ip not in last_alert_time or now - last_alert_time[ip] >= time_window:
+                                print(f"\033[1;31mALERT\033[0m: Potential brute-force attack from IP: {ip}")
                             try:
                                 print(f"WARNING: Blocking potential brute-force from IP: {ip}")
                                 result = subprocess.run(["sudo", "iptables", "-A", "INPUT", "-s", ip, "-j", "DROP"], check=True, capture_output=True)
@@ -42,7 +53,10 @@ def analyze_logs():
                             except subprocess.CalledProcessError as e:
                                 print(f"ERROR: {e}")
 
+                            last_alert_time[ip] = now
+
             time.sleep(60) # Check every minute
+            
         except FileNotFoundError:
             print(f"Error: Log file '{log_file}' not found.")
             break
