@@ -38,9 +38,10 @@ def analyze_logs():
                             try:
                                 print(f"WARNING: Blocking potential brute-force from IP: {ip}")
                                 result = subprocess.run(["sudo", "iptables", "-A", "INPUT", "-s", ip, "-j", "DROP"], check=True, capture_output=True)
+                                print(f"WARNING: Blocked IP {ip}")
                             except subprocess.CalledProcessError as e:
                                 print(f"ERROR: {e}")
-                                
+
             time.sleep(60) # Check every minute
         except FileNotFoundError:
             print(f"Error: Log file '{log_file}' not found.")
