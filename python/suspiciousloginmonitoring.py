@@ -11,6 +11,7 @@
 import re
 import time
 from collections import defaultdict
+import subprocess
 # Log file path (adjust to your system)
 log_file = "/var/log/auth.log" # Example: /var/log/auth.log on Linux
 # Failed login threshold
@@ -34,7 +35,12 @@ def analyze_logs():
                         failed_attempts[ip] = recent_attempts # Keep onlyrecent attempts
                         if len(recent_attempts) >= threshold:
                             print(f"ALERT: Potential brute-force attack from IP: {ip}")
-                            # You could add code here to block the IP (Bonus Challenge)
+                            try:
+                                print(f"WARNING: Blocking potential brute-force from IP: {ip}")
+                                result = subprocess.run(["sudo", "iptables", "-A", "INPUT", "-s", ip, "-j", "DROP"], check=True, capture_output=True)
+                            except subprocess.CalledProcessError as e:
+                                print(f"ERROR: {e}")
+                                
             time.sleep(60) # Check every minute
         except FileNotFoundError:
             print(f"Error: Log file '{log_file}' not found.")
