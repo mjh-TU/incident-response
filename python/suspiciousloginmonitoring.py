@@ -33,6 +33,7 @@ def analyze_logs():
                 last_position = f.tell()
 
                 now = time.time()
+                new_alerts = False
                 
                 for line in lines:
                     # Regex to extract IP from failed login attempts
@@ -56,7 +57,10 @@ def analyze_logs():
                                     print(f"ERROR: {e}")
 
                                 last_alert_time[ip] = now
-
+                                new_alerts = True
+                                
+            if not new_alerts:
+                print(f"INFO: No new alerts or warnings as of {time.strftime('%Y-%m-%d %H:%M:%S')}")
             time.sleep(60) # Check every minute
             
         except FileNotFoundError:
