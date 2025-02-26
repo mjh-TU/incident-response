@@ -45,17 +45,14 @@ everything() {
 
 sshlogins () {
 
-    head "SSH Logins:"
+    head "SSH Logins (Past 1h):"
     # Show SSH logins on the current day
 
     if [[ $DISTRIBUTION == "debian" ]]
-        then sshlogins=$(journalctl -u ssh --no-pager | grep "$(date "+%b %d")")
+        then sshlogins=$(journalctl -u ssh --since "1 hour ago" --no-pager)
         # Check if output of command has any characters
         if [[ -n "$sshlogins" ]]
             then echo $sshlogins
-        else
-            # If no output from command then there are no SSH Logins
-            echo "None"
         fi
     fi
 }
