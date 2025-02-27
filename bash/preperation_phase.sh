@@ -37,9 +37,11 @@ help () {
 
 everything() {
     users
-    sshlogins
+    read -p "Enter to continue"
     processes
+    read -p "Enter to continue"
     software
+    read -p "Enter to continue"
     usbactivity
 }
 
@@ -79,6 +81,7 @@ software() {
         then yum list installed | awk '{print $1}'
     fi
 
+    read -p "Enter to continue"
     head "Outdated Software:"
 
     if [[ $DISTRIBUTION == "debian" ]]
